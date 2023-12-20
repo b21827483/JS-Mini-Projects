@@ -91,6 +91,7 @@ button:active {
   background: white;
 }
 
+
 #active-projects {
   border: 1px solid #870099;
 }
@@ -123,4 +124,8 @@ button:active {
 #finished-projects header h2 {
   color: white;
   margin: 0;
+}
+
+.droppable {
+  background-color: #b91313;
 }

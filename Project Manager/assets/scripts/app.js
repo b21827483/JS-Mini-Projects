@@ -25,7 +25,6 @@ class Component {
         else {
         this.hostElement = document.body;
         }
-
         this.insertBefore = insertBefore;
     }
 
@@ -92,7 +91,8 @@ class ProjectItem {
         this.id = id;
         this.switchProjectHandler = switchProjectFunc;
         this.connectSwitchButton(type);
-        this.connectMoreInfo()
+        this.connectMoreInfo();
+        this.connetDrag();
     }
 
     showMoreInfoHandler () {
@@ -108,6 +108,13 @@ class ProjectItem {
 
         tooltip.attach();
         this.hasMoreInfoOpen = true;       
+    }
+
+    connetDrag() {
+        document.getElementById(this.id).addEventListener("dragstart", event => {
+            event.dataTransfer.setData("text/plain", this.id);
+            event.dataTransfer.effectAllowed = "move"
+        })
     }
 
     connectMoreInfo() { 
@@ -141,6 +148,36 @@ class ProjectList {
         const projItems = document.querySelectorAll(`#${type}-projects li`);
         for (const item of projItems)
             this.projects.push(new ProjectItem(item.id, this.switchProject.bind(this), this.type))
+
+        this.createDropzone();
+    }
+
+    createDropzone(){
+        const dropzone = document.querySelector(`#${this.type}-projects ul`);
+
+        dropzone.addEventListener("dragenter", event => {
+            event.preventDefault();
+            dropzone.parentElement.classList.add("droppable")
+        })
+        dropzone.addEventListener("dragover", event => {
+            event.preventDefault()
+        })
+
+        dropzone.addEventListener("dragleave", event => {
+            if (event.relatedTarget.closest(`#${this.type}-projects ul`) !== dropzone)
+                dropzone.parentElement.classList.remove("droppable")
+        })
+
+        dropzone.addEventListener("drop", event => {
+            const proj = event.dataTransfer.getData("text/plain");
+            if (this.projects.find(p => p.id === proj)) {
+                return;
+            }
+
+            document.getElementById(proj).querySelector("button:last-of-type").click();
+            dropzone.parentElement.classList.remove("droppable")
+
+        })
     }
 
     addProject(project){
